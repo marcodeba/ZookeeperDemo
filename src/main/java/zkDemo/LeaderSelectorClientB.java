@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 public class LeaderSelectorClientB extends LeaderSelectorListenerAdapter implements Closeable {
-
     private String name;  //表示当前的进程
     private LeaderSelector leaderSelector;  //leader选举的API
     private CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -56,6 +55,8 @@ public class LeaderSelectorClientB extends LeaderSelectorListenerAdapter impleme
         LeaderSelector leaderSelector = new LeaderSelector(curatorFramework, "/leader", leaderSelectorClient);
         leaderSelectorClient.setLeaderSelector(leaderSelector);
         leaderSelectorClient.start(); //开始选举
+        leaderSelectorClient.close();
+
         System.in.read();
     }
 }

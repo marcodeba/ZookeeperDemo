@@ -7,25 +7,30 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class LockDemo {
     private static String CONNECTION_PATH = "localhost:2181";
 
     public static void main(String[] args) {
-        CuratorFramework curatorFramework = CuratorFrameworkFactory.builder().
-                connectString(CONNECTION_PATH).sessionTimeoutMs(5000).
-                retryPolicy(new ExponentialBackoffRetry(1000, 3)).build();
+        CuratorFramework curatorFramework = CuratorFrameworkFactory.builder()
+                .connectString(CONNECTION_PATH)
+                .sessionTimeoutMs(5000)
+                .connectionTimeoutMs(1000)
+                .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+                .build();
         curatorFramework.start();
 
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         final InterProcessMutex lock = new InterProcessMutex(curatorFramework, "/locks");
         for (int i = 0; i < 10; i++) {
             executorService.execute(() -> {
-                System.out.println(Thread.currentThread().getName() + "->尝试竞争锁");
                 try {
-                    lock.acquire();
-                    System.out.println(Thread.currentThread().getName() + "->成功获得了锁");
-                    Thread.sleep(4000);
+                    System.out.println(Thread.currentThread().getName() + "->尝试竞争锁");
+                    if (lock.acquire(4000, TimeUnit.SECONDS)){
+                        System.out.println(Thread.currentThread().getName() + "->成功获得了锁");
+                        Thread.sleep(2000);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {

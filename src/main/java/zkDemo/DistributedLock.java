@@ -31,11 +31,7 @@ public class DistributedLock implements Lock, Watcher {
                 zk.create(ROOT_LOCK, "0".getBytes(),
                         ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (KeeperException e) {
+        } catch (IOException | InterruptedException | KeeperException e) {
             e.printStackTrace();
         }
     }
