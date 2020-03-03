@@ -52,14 +52,14 @@ public class WatcherDemo {
 //        zooKeeper.delete("/zk-persist", stat.getVersion());
 //    }
 
-    private static String CONNECTION_STR = "localhost:2181";
+    private static String CONNECTION_PATH = "localhost:2181";
 
     public static void main(String[] args) throws Exception {
         //PathChildCache  针对于子节点的创建、删除和更新触发事件
         //NodeCache  针对当前节点的变化触发事件
         //TreeCache  综合事件
         CuratorFramework curatorFramework = CuratorFrameworkFactory.builder().
-                connectString(CONNECTION_STR).sessionTimeoutMs(5000).
+                connectString(CONNECTION_PATH).sessionTimeoutMs(5000).
                 retryPolicy(new ExponentialBackoffRetry(1000, 3)).build();
         curatorFramework.start();
 //        addListenerWithNode(curatorFramework);

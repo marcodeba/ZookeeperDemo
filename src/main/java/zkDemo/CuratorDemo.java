@@ -26,7 +26,7 @@ public class CuratorDemo {
         createData(curatorFramework);
         updateData(curatorFramework);
         deleteData(curatorFramework);
-//        createDataWithACL(curatorFramework);
+        createDataWithACL(curatorFramework);
 
         curatorFramework.close();
     }

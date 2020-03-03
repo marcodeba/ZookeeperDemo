@@ -9,11 +9,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class LockDemo {
-    private static String CONNECTION_STR = "localhost:2181";
+    private static String CONNECTION_PATH = "localhost:2181";
 
     public static void main(String[] args) {
         CuratorFramework curatorFramework = CuratorFrameworkFactory.builder().
-                connectString(CONNECTION_STR).sessionTimeoutMs(50000000).
+                connectString(CONNECTION_PATH).sessionTimeoutMs(5000).
                 retryPolicy(new ExponentialBackoffRetry(1000, 3)).build();
         curatorFramework.start();
 
