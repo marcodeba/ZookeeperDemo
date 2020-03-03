@@ -5,8 +5,10 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 
-public class LockDemo {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+public class LockDemo {
     private static String CONNECTION_STR = "localhost:2181";
 
     public static void main(String[] args) {
@@ -15,25 +17,25 @@ public class LockDemo {
                 retryPolicy(new ExponentialBackoffRetry(1000, 3)).build();
         curatorFramework.start();
 
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
         final InterProcessMutex lock = new InterProcessMutex(curatorFramework, "/locks");
-
         for (int i = 0; i < 10; i++) {
-            new Thread(() -> {
+            executorService.execute(() -> {
                 System.out.println(Thread.currentThread().getName() + "->尝试竞争锁");
                 try {
-                    lock.acquire(); //阻塞竞争锁
+                    lock.acquire();
                     System.out.println(Thread.currentThread().getName() + "->成功获得了锁");
                     Thread.sleep(4000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
                     try {
-                        lock.release(); //释放锁
+                        lock.release();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-            }, "Thread-" + i).start();
+            });
         }
     }
 }
