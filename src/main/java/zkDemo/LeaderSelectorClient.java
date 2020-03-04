@@ -21,15 +21,18 @@ public class LeaderSelectorClient extends LeaderSelectorListenerAdapter implemen
     }
 
     public static void main(String[] args) throws IOException {
-        CuratorFramework curatorFramework = CuratorFrameworkFactory.builder().
-                connectString(CONNECTION_PATH).sessionTimeoutMs(5000).
-                retryPolicy(new ExponentialBackoffRetry(1000, 3)).build();
+        CuratorFramework curatorFramework = CuratorFrameworkFactory
+                .builder()
+                .connectString(CONNECTION_PATH)
+                .sessionTimeoutMs(5000)
+                .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+                .build();
         curatorFramework.start();
+
         LeaderSelectorClient leaderSelectorClient = new LeaderSelectorClient("ClientA");
         LeaderSelector leaderSelector = new LeaderSelector(curatorFramework, "/leader", leaderSelectorClient);
         leaderSelectorClient.setLeaderSelector(leaderSelector);
         leaderSelectorClient.start(); //开始选举
-        leaderSelectorClient.close();
 
         System.in.read();
     }

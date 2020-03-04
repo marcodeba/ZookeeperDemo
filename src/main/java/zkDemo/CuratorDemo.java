@@ -17,9 +17,11 @@ public class CuratorDemo {
     private static final String CONNECTION_PATH = "localhost:2181";
 
     public static void main(String[] args) {
-        CuratorFramework curatorFramework = CuratorFrameworkFactory.builder()
+        CuratorFramework curatorFramework = CuratorFrameworkFactory
+                .builder()
                 .connectString(CONNECTION_PATH)
-                .sessionTimeoutMs(5000).retryPolicy(new ExponentialBackoffRetry(1000, 3))
+                .sessionTimeoutMs(5000)
+                .retryPolicy(new ExponentialBackoffRetry(1000, 3))
                 .build();
         curatorFramework.start();
 
@@ -50,7 +52,6 @@ public class CuratorDemo {
 
     public static void deleteData(CuratorFramework curatorFramework) {
         Stat stat = new Stat();
-
         try {
             curatorFramework.getData().storingStatIn(stat).forPath("/data/program");
             curatorFramework.delete().withVersion(stat.getVersion()).forPath("/data/program");

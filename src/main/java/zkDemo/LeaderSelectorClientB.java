@@ -11,12 +11,30 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 public class LeaderSelectorClientB extends LeaderSelectorListenerAdapter implements Closeable {
+    private static String CONNECTION_PATH = "localhost:2181";
     private String name;  //表示当前的进程
     private LeaderSelector leaderSelector;  //leader选举的API
     private CountDownLatch countDownLatch = new CountDownLatch(1);
 
     public LeaderSelectorClientB(String name) {
         this.name = name;
+    }
+
+    public static void main(String[] args) throws IOException {
+        CuratorFramework curatorFramework = CuratorFrameworkFactory
+                .builder()
+                .connectString(CONNECTION_PATH)
+                .sessionTimeoutMs(5000)
+                .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+                .build();
+        curatorFramework.start();
+
+        LeaderSelectorClientB leaderSelectorClient = new LeaderSelectorClientB("ClientB");
+        LeaderSelector leaderSelector = new LeaderSelector(curatorFramework, "/leader", leaderSelectorClient);
+        leaderSelectorClient.setLeaderSelector(leaderSelector);
+        leaderSelectorClient.start(); //开始选举
+
+        System.in.read();
     }
 
     public LeaderSelector getLeaderSelector() {
@@ -42,22 +60,6 @@ public class LeaderSelectorClientB extends LeaderSelectorListenerAdapter impleme
     @Override
     public void close() {
         leaderSelector.close();
-    }
-
-    private static String CONNECTION_PATH = "localhost:2181";
-
-    public static void main(String[] args) throws IOException {
-        CuratorFramework curatorFramework = CuratorFrameworkFactory.builder().
-                connectString(CONNECTION_PATH).sessionTimeoutMs(5000).
-                retryPolicy(new ExponentialBackoffRetry(1000, 3)).build();
-        curatorFramework.start();
-        LeaderSelectorClientB leaderSelectorClient = new LeaderSelectorClientB("ClientB");
-        LeaderSelector leaderSelector = new LeaderSelector(curatorFramework, "/leader", leaderSelectorClient);
-        leaderSelectorClient.setLeaderSelector(leaderSelector);
-        leaderSelectorClient.start(); //开始选举
-        leaderSelectorClient.close();
-
-        System.in.read();
     }
 }
 
