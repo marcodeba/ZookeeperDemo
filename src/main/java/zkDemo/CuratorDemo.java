@@ -26,9 +26,10 @@ public class CuratorDemo {
         curatorFramework.start();
 
         createData(curatorFramework);
-        updateData(curatorFramework);
-        deleteData(curatorFramework);
-        createDataWithACL(curatorFramework);
+        readData(curatorFramework);
+        //updateData(curatorFramework);
+        //deleteData(curatorFramework);
+        //createDataWithACL(curatorFramework);
 
         curatorFramework.close();
     }
@@ -40,6 +41,20 @@ public class CuratorDemo {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String readData(CuratorFramework curatorFramework) {
+        Stat stat = new Stat();
+        byte[] bytes = new byte[0];
+        try {
+            bytes = curatorFramework.getData().storingStatIn(stat).forPath("/data/program");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String result = new String(bytes);
+        System.out.println("result : " + result);
+
+        return result;
     }
 
     public static void updateData(CuratorFramework curatorFramework) {
