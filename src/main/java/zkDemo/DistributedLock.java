@@ -48,11 +48,14 @@ public class DistributedLock implements Lock, Watcher {
             for (String children : childrens) {
                 sortedSet.add(ROOT_LOCK + "/" + children);
             }
-            String firstNode = sortedSet.first(); //获得当前所有子节点中最小的节点
-            SortedSet<String> lessThenMe = ((TreeSet<String>) sortedSet).headSet(CURRENT_LOCK); //
-            if (CURRENT_LOCK.equals(firstNode)) {//通过当前的节点和子节点中最小的节点进行比较，如果相等，表示获得锁成功
+            //获得当前所有子节点中最小的节点
+            String firstNode = sortedSet.first();
+            //通过当前的节点和子节点中最小的节点进行比较，如果相等，表示获得锁成功
+            if (CURRENT_LOCK.equals(firstNode)) {
                 return true;
             }
+
+            SortedSet<String> lessThenMe = ((TreeSet<String>) sortedSet).headSet(CURRENT_LOCK); //
             if (!lessThenMe.isEmpty()) {
                 WAIT_LOCK = lessThenMe.last();//获得比当前节点更小的最后一个节点，设置给WAIT_LOCK
             }
@@ -84,7 +87,6 @@ public class DistributedLock implements Lock, Watcher {
             System.out.println(Thread.currentThread().getName() + "->等待锁" + ROOT_LOCK + "/" + prev + "释放");
             countDownLatch = new CountDownLatch(1);
             countDownLatch.await();
-            //TODO  watcher触发以后，还需要再次判断当前等待的节点是不是最小的
             System.out.println(Thread.currentThread().getName() + "->获得锁成功");
         }
         return true;

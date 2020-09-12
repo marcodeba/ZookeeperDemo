@@ -32,7 +32,7 @@ public class LeaderSelectorClient extends LeaderSelectorListenerAdapter implemen
         LeaderSelectorClient leaderSelectorClient = new LeaderSelectorClient("ClientA");
         LeaderSelector leaderSelector = new LeaderSelector(curatorFramework, "/leader", leaderSelectorClient);
         leaderSelectorClient.setLeaderSelector(leaderSelector);
-        leaderSelectorClient.start(); //开始选举
+        leaderSelectorClient.start();
 
         System.in.read();
     }

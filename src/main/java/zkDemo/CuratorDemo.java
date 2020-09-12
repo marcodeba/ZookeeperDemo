@@ -12,6 +12,7 @@ import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class CuratorDemo {
     private static final String CONNECTION_PATH = "localhost:2181";
@@ -25,8 +26,9 @@ public class CuratorDemo {
                 .build();
         curatorFramework.start();
 
-        createData(curatorFramework);
-        readData(curatorFramework);
+        //createData(curatorFramework);
+        //readData(curatorFramework);
+        createDataWithAsync(curatorFramework);
         //updateData(curatorFramework);
         //deleteData(curatorFramework);
         //createDataWithACL(curatorFramework);
@@ -55,6 +57,22 @@ public class CuratorDemo {
         System.out.println("result : " + result);
 
         return result;
+    }
+
+    public static void createDataWithAsync(CuratorFramework curatorFramework) {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        try {
+            curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT)
+                    .inBackground((curatorFramework1, curatorEvent) -> {
+                        System.out.println(Thread.currentThread().getName() + ":" + curatorEvent.getResultCode());
+                        countDownLatch.countDown();
+                    }).forPath("/create/async", "second".getBytes());
+            System.out.println("before createDataWithAsync");
+            countDownLatch.await();
+            System.out.println("after createDataWithAsync");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void updateData(CuratorFramework curatorFramework) {

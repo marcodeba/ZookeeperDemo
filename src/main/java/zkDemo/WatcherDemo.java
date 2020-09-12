@@ -62,6 +62,7 @@ public class WatcherDemo {
                 connectString(CONNECTION_PATH).sessionTimeoutMs(5000).
                 retryPolicy(new ExponentialBackoffRetry(1000, 3)).build();
         curatorFramework.start();
+
 //        addListenerWithNode(curatorFramework);
         addListenerWithChild(curatorFramework);
 
@@ -69,7 +70,8 @@ public class WatcherDemo {
     }
 
     //配置中心
-    //创建、修改、删除
+    // 当zookeeper中相应路径的节点发生更新、创建或者删除操作时，NodeCache将会得到响应，并且会将最新的数据拉到本地缓存中
+    // NodeCache只会监听路径本身的变化，并不会监听子节点的变化
     private static void addListenerWithNode(CuratorFramework curatorFramework) throws Exception {
         NodeCache nodeCache = new NodeCache(curatorFramework, "/data", false);
         NodeCacheListener nodeCacheListener = () -> {
